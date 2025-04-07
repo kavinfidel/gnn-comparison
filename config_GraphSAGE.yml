@@ -13,7 +13,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-#
+
+# CHANGES MADE:
+  # added config for "use_rewired_for_all_layers"
 model:
   - GraphSAGE
 device:
@@ -59,3 +61,4 @@ aggregation:
   - add
   - max
   - mean
+use_rewired_for_all_layers: true

@@ -27,6 +27,7 @@ class GraphSAGE(nn.Module):
         num_layers = config['num_layers']
         dim_embedding = config['dim_embedding']
         self.aggregation = config['aggregation']  # can be mean or max
+        self.use_rewired_for_all_layers = config.get('use_rewired_for_all_layers',False)
 
         if self.aggregation == 'max':
             self.fc_max = nn.Linear(dim_embedding, dim_embedding)
@@ -44,12 +45,19 @@ class GraphSAGE(nn.Module):
         self.fc1 = nn.Linear(num_layers * dim_embedding, dim_embedding)
         self.fc2 = nn.Linear(dim_embedding, dim_target)
 
-    def forward(self, data):
+    def forward(self, data, rewired_edge_index = None):
         x, edge_index, batch = data.x, data.edge_index, data.batch
+
+        if self.use_rewired_for_all_layers and rewired_edge_index is not None:
+            edge_index = rewired_edge_index
 
         x_all = []
 
         for i, layer in enumerate(self.layers):
+
+            if not self.use_rewired_for_all_layers and i == len(self.layers) - 1 and rewired_edge_index is not None:
+                edge_index = rewired_edge_index
+                
             x = layer(x, edge_index)
             if self.aggregation == 'max':
                 x = torch.relu(self.fc_max(x))

@@ -13,11 +13,20 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-#
-import networkx as nx
 
+
+#
+# CHANGES MADE:
+# New Functions Added:
+    # rewire_edge function, 
+# Altered Functions:
+    # altered get_edge_index function, 
+import networkx as nx
+import logging
 import torch
 from torch_geometric.utils import dense_to_sparse
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 class Graph(nx.Graph):
@@ -26,11 +35,81 @@ class Graph(nx.Graph):
         self.target = target
         self.laplacians = None
         self.v_plus = None
+    
+    def rewire_edges(self):
+        """
+        Rewire the edges of the graph using the rewire2 
 
-    def get_edge_index(self):
+        Returns:
+            torch.Tensor: The rewired edge index: (2, num_edges) format.
+        """
+
+        logging.info("Edge Rewiring starting for graph with %d nodes and %d edges", self.number_of_nodes(), self.number_of_edges())
+
+        g6 = to_networkx(self, to_undirected=True)
+        bridges = list(nx.bridges(g6))
+        adj_node_dict = {}
+
+        # Filter bridges to ensure nodes have more than one neighbor
+        filtered_bridges = [bridge for bridge in bridges
+                            if len(list(g6.neighbors(bridge[0]))) > 1 and
+                            len(list(g6.neighbors(bridge[1]))) > 1]
+        logging.info("Filtered down to %d bridges after ensuring neighbors", len(filtered_bridges))
+
+        # Get all neighbors for each bridge node
+        for u, v in filtered_bridges:
+            for node in (u, v):
+                adj_nodes = list(nx.all_neighbors(g6, node))
+                adj_node_dict[node] = adj_nodes
+
+        # Filter to only include nodes with more than one neighbor
+        adj_node_dict = {key: value for key, value in adj_node_dict.items() if len(value) > 1}
+        keys = set(adj_node_dict.keys())
+        logging.info("Filtered adjacency dictionary to %d nodes with more than one neighbor", len(adj_node_dict))
+
+        for key, values in adj_node_dict.items():
+            # Remove any bridge node found in the list
+            adj_node_dict[key] = [v for v in values if v not in keys]
+
+        for u, v in filtered_bridges:
+            neighbors_u = adj_node_dict.get(u, [])
+            neighbors_v = adj_node_dict.get(v, [])
+
+            # Connect neighbors of u to v
+            for node_u in neighbors_u:
+                if node_u != v and not g6.has_edge(node_u, v):
+                    g6.add_edge(node_u, v)
+
+            # Connect neighbors of v to u
+            for node_v in neighbors_v:
+                if node_v != u and not g6.has_edge(node_v, u):
+                    g6.add_edge(node_v, u)
+
+        # Convert the modified graph back to edge_index
+        adj_matrix = nx.adjacency_matrix(g6).toarray()
+        edge_index = torch.tensor(adj_matrix, dtype=torch.long).nonzero().t().contiguous()
+        logging.info("Rewiring complete. New edge count: %d", edge_index.size(1))
+        return edge_index
+
+
+    def get_edge_index(self, rewire = False ):
         adj = torch.Tensor(nx.to_numpy_array(self))
         edge_index, _ = dense_to_sparse(adj)
+
+        if rewire:
+            edge_index = self.rewire_edges()
         return edge_index
+    
+    def get_original_and_rewired_edge_index(self):
+        """
+        Get both the original and rewired edge indices.
+
+        Returns:
+            tuple: (original_edge_index, rewired_edge_index)
+        """
+        original_edge_index = self.get_edge_index(rewire=False)
+        rewired_edge_index = self.get_edge_index(rewire=True)
+        return original_edge_index, rewired_edge_index
 
     def get_edge_attr(self):
         features = []

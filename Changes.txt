@@ -1,0 +1,11 @@
+# List of Changes performed
+
+# graph.py:
+    one function altered.
+    one function added- rewire function
+
+# GraphSAGE.py:
+    Accomodated changes pertaining to rewire, i.e all layers rewire/ final layer rewire
+
+# config_GraphSAGE.yml
+    Added the 'use_rewired_for_all_layers' config parameter
