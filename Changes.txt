@@ -9,3 +9,7 @@
 
 # config_GraphSAGE.yml
     Added the 'use_rewired_for_all_layers' config parameter
+
+# PrepareDatasets.py:
+    * Wrote a new function for preprocessing that will perform rewiring for all datasets.
+    - What is the use of "--outer-k" and "inner_k" inside PrepareDatasets.py
