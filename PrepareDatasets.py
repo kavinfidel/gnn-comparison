@@ -60,44 +60,45 @@ def get_args_dict():
     return vars(parser.parse_args())
 
 
-# def preprocess_dataset(name, args_dict):
-#     dataset_class = DATASETS[name]
-#     if name == 'ENZYMES':
-#         args_dict.update(use_node_attrs=True)
-#     dataset_class(**args_dict)
-
-def preprocess_dataset(dataset_path, dataset_name, use_rewired = False):
+def preprocess_dataset(dataset_path, dataset_name, use_rewired=False):
+    """
+    Preprocess the dataset and optionally add rewired edges.
+    Makes sure:
+     The data object has both the edge_index(unaltered) an rewired_edge_index
+     To change the rewiring(eg: rewire1 --> betweenes) only make changes to graph.py
 
     """
-    Preprocesses the dataset and rewires them
-    """
+
     dataset_dir = os.path.join(dataset_path, dataset_name)
     if not os.path.exists(dataset_dir):
-        raise FileNotFoundError(f"{dataset_dir} does not exist")
+        raise FileNotFoundError(f"Dataset directory {dataset_dir} does not exist")
 
     logging.info(f"Preprocessing started for {dataset_name}")
     if dataset_name in DATASETS:
         dataset_class = DATASETS[dataset_name]
 
         if dataset_name == 'ENZYMES':
-            dataset = dataset_class(root = dataset_path, use_node_attr = True)
+            dataset = dataset_class(root=dataset_path, use_node_attr=True)
             logging.info(f"Additional 18 node attributes used for ENZYMES")
         else:
-            dataset = dataset_class(root = dataset_path)
+            dataset = dataset_class(root=dataset_path)
     else:
-        dataset = TUDataset(root = dataset_path, name = dataset_name)
+        dataset = TUDataset(root=dataset_path, name=dataset_name)
 
-    for data in dataset:
-        graph = Graph(target =  data.y.item())
-        logging.info(f"Processing graph {i+1}/{len(dataset)}")
+    for i, data in enumerate(dataset):
+        logging.info(f"Processing graph {i + 1}/{len(dataset)} in dataset {dataset_name}")
+        graph = Graph(target=data.y.item())
         graph.add_edges_from(data.edge_index.t().tolist())
-    
-        if use_rewired:
-            rewired_edge_index = graph.rewire_edges()
-            data.rewired_edge_index = rewired_edge_index
 
-    torch.save(dataset, os.path.join(dataset_path, f"{dataset_name}_processed.pt"))
-    print(f"Dataset {dataset_name} proccesed & saved {dataset_path}.")
+        if use_rewired:
+        # Use the method from graph.py to get both original and rewired edge indices
+            data.rewired_edge_index = graph.get_edge_index(rewire=True)
+        # data.edge_index IS THE ORIGNAL (UNALTERED) Edge index
+
+    # Save the dataset with a different name if rewired
+    save_name = f"{dataset_name}_rewired&original_preprocessed.pt" if use_rewired else f"{dataset_name}_processed.pt"
+    torch.save(dataset, os.path.join(dataset_path, save_name))
+    print(f"Dataset {dataset_name} processed & saved as {save_name} in {dataset_path}.")
 
 
 
