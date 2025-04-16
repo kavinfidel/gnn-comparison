@@ -47,8 +47,12 @@ class NetWrapper:
 
             data = data.to(self.device)
             optimizer.zero_grad()
-            output = model(data)
+           # output = model(data) -# before
 
+           # updated code:----------------------------
+            rewired_edge_index = getattr(data,'rewired_edge_index',None)
+            output = model(data, rewired_edge_index = rewired_edge_index)
+           #------------------------------------------
             if not isinstance(output, tuple):
                 output = (output,)
 
@@ -85,7 +89,12 @@ class NetWrapper:
         acc_all = 0
         for data in loader:
             data = data.to(self.device)
-            output = model(data)
+            #output = model(data) - old code
+            # new change -----------------:
+            rewired_edge_index = getattr(data, 'rewired_edge_index',None)
+            output = model(data, rewired_edge_index = rewired_edge_index)
+            #------------------------------:
+                      
 
             if not isinstance(output, tuple):
                 output = (output,)

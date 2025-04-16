@@ -12,4 +12,7 @@
 
 # PrepareDatasets.py:
     * Wrote a new function for preprocessing that will perform rewiring for all datasets.
+    * retains the og edge_index also
     - What is the use of "--outer-k" and "inner_k" inside PrepareDatasets.py
+# Netwrapper.py:
+    * Accomodated rewired_edge_index in train and classify_graph functions.
