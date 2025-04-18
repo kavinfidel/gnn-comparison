@@ -19,9 +19,12 @@ import os
 import logging
 import torch
 from datasets import *
-from datasets.graph import Graph
 from torch_geometric.datasets import TUDataset
-from torch_geometric_data import Data
+from torch_geometric.data import Data
+import networkx as nx
+from torch_geometric.utils import dense_to_sparse
+from torch_geometric.utils.convert import to_networkx
+from datasets.rewire import rewire_graph
 
 logging.basicConfig(level = logging.INFO, format ='%(asctime)s - %(levelname)s - %(message)s' )
 DATASETS = {
@@ -43,7 +46,7 @@ def get_args_dict():
     parser.add_argument('DATA_DIR',
                         help='where to save the datasets')
     parser.add_argument('--dataset-name', dest='dataset_name',
-                        choices=DATASETS.keys(), default='all', help='dataset name [Default: \'all\']')
+                        default='all', help='dataset name [Default: \'all\']')
     parser.add_argument('--outer-k', dest='outer_k', type=int,
                         default=10, help='evaluation folds [Default: 10]')
     parser.add_argument('--inner-k', dest='inner_k', type=int,
@@ -69,10 +72,7 @@ def preprocess_dataset(dataset_path, dataset_name, use_rewired=False):
 
     """
 
-    dataset_dir = os.path.join(dataset_path, dataset_name)
-    if not os.path.exists(dataset_dir):
-        raise FileNotFoundError(f"Dataset directory {dataset_dir} does not exist")
-
+   # dataset_dir = os.path.join(dataset_path, dataset_name)
     logging.info(f"Preprocessing started for {dataset_name}")
     if dataset_name in DATASETS:
         dataset_class = DATASETS[dataset_name]
@@ -87,13 +87,14 @@ def preprocess_dataset(dataset_path, dataset_name, use_rewired=False):
 
     for i, data in enumerate(dataset):
         logging.info(f"Processing graph {i + 1}/{len(dataset)} in dataset {dataset_name}")
-        graph = Graph(target=data.y.item())
-        graph.add_edges_from(data.edge_index.t().tolist())
-
+        # convert data to nx graph
+        # pass into rewire function
         if use_rewired:
+            graph = to_networkx(data, to_undirected=True)
         # Use the method from graph.py to get both original and rewired edge indices
-            data.rewired_edge_index = graph.get_edge_index(rewire=True)
+            data.rewired_edge_index = rewire_graph(graph).long()
         # data.edge_index IS THE ORIGNAL (UNALTERED) Edge index
+            logging.info(f"Original edges: {data.edge_index.size(1)} | Rewired edges: {data.rewired_edge_index.size(1)}")
 
     # Save the dataset with a different name if rewired
     save_name = f"{dataset_name}_rewired&original_preprocessed.pt" if use_rewired else f"{dataset_name}_processed.pt"
@@ -104,23 +105,27 @@ def preprocess_dataset(dataset_path, dataset_name, use_rewired=False):
 
 if __name__ == "__main__":
     
-    # args_dict = get_args_dict()
+    args_dict = get_args_dict()
 
-    # print(args_dict)
+    print(args_dict)
 
-    # dataset_name = args_dict.pop('dataset_name')
-    # if dataset_name == 'all':
-    #     for name in DATASETS:
-    #         preprocess_dataset(name, args_dict)
-    # else:
-    #     preprocess_dataset(dataset_name, args_dict)
+    dataset_name = args_dict['dataset_name']
+    dataset_path = args_dict['DATA_DIR']
+    use_rewired = args_dict['use_rewired']
 
-    parser = argparse.ArgumentParser(description="Preprocess datasets.")
-    parser.add_argument("dataset_path", type=str, help="Path to the dataset folder.")
-    parser.add_argument("--dataset-name", type=str, required=True, help="Name of the dataset.")
-    parser.add_argument("--use-rewired", action="store_true", help="Add rewired edges to the dataset.")
-    args = parser.parse_args()
+    if dataset_name == 'all':
+        for name in DATASETS:
+            preprocess_dataset(dataset_path, name, use_rewired=use_rewired)
+    else:
+        preprocess_dataset(dataset_path, dataset_name, use_rewired=use_rewired)
+
+    # parser = argparse.ArgumentParser(description="Preprocess datasets.")
+    # parser.add_argument("dataset_path", type=str, help="Path to the dataset folder.")
+    # parser.add_argument("--dataset-name", type=str, required=True, help="Name of the dataset.")
+    # parser.add_argument("--use-rewired", action="store_true", help="Add rewired edges to the dataset.")
+    # args = parser.parse_args()
     
-    preprocess_dataset(args.dataset_path, args.dataset_name, use_rewired=args.use_rewired)
+    # preprocess_dataset(args.dataset_path, args.dataset_name, use_rewired=args.use_rewired)
 
 # use it like: python PrepareDatasets.py DATA/CHEMICAL --dataset-name NCI1 --use-rewired
+
