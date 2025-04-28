@@ -27,7 +27,8 @@ class GraphSAGE(nn.Module):
         num_layers = config['num_layers']
         dim_embedding = config['dim_embedding']
         self.aggregation = config['aggregation']  # can be mean or max
-        self.use_rewired_for_all_layers = config.get('use_rewired_for_all_layers',False)
+        self.use_rewired_for_all_layers = False
+        
 
         if self.aggregation == 'max':
             self.fc_max = nn.Linear(dim_embedding, dim_embedding)

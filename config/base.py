@@ -54,6 +54,7 @@ class Config:
         'PROTEINS': Proteins,
         'ENZYMES': Enzymes,
         'DD': DD,
+    
     }
 
     models = {

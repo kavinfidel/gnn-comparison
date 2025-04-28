@@ -24,7 +24,37 @@ from torch_geometric.data import Data
 import networkx as nx
 from torch_geometric.utils import dense_to_sparse
 from torch_geometric.utils.convert import to_networkx
-from datasets.rewire import rewire_graph
+
+
+def rewire_graph(g: nx.Graph) -> torch.Tensor:
+    logging.info("Edge Rewiring starting for graph with %d nodes and %d edges", g.number_of_nodes(), g.number_of_edges())
+
+    g6 = g.copy()
+    bridges = list(nx.bridges(g6))
+    adj_node_dict = {}
+
+    filtered_bridges = [bridge for bridge in bridges
+                        if g6.degree[bridge[0]] > 1 and g6.degree[bridge[1]] > 1]
+
+    logging.info("Filtered down to %d bridges after degree check", len(filtered_bridges))
+
+    for u, v in filtered_bridges:
+        for node in (u, v):
+            neighbors = list(nx.neighbors(g6, node))
+            if len(neighbors) > 1:
+                adj_node_dict[node] = [n for n in neighbors if n not in (u, v)]
+
+    for u, v in filtered_bridges:
+        for nu in adj_node_dict.get(u, []):
+            if nu != v and not g6.has_edge(nu, v):
+                g6.add_edge(nu, v)
+        for nv in adj_node_dict.get(v, []):
+            if nv != u and not g6.has_edge(nv, u):
+                g6.add_edge(nv, u)
+
+    edge_index = torch.tensor(list(g6.edges), dtype=torch.long).t().contiguous()
+    logging.info("Rewiring complete. New edge count: %d", edge_index.size(1))
+    return edge_index
 
 logging.basicConfig(level = logging.INFO, format ='%(asctime)s - %(levelname)s - %(message)s' )
 DATASETS = {
@@ -74,16 +104,16 @@ def preprocess_dataset(dataset_path, dataset_name, use_rewired=False):
 
    # dataset_dir = os.path.join(dataset_path, dataset_name)
     logging.info(f"Preprocessing started for {dataset_name}")
-    if dataset_name in DATASETS:
-        dataset_class = DATASETS[dataset_name]
+    # if dataset_name in DATASETS:
+    #     dataset_class = DATASETS[dataset_name]
 
-        if dataset_name == 'ENZYMES':
-            dataset = dataset_class(root=dataset_path, use_node_attr=True)
-            logging.info(f"Additional 18 node attributes used for ENZYMES")
-        else:
-            dataset = dataset_class(root=dataset_path)
-    else:
-        dataset = TUDataset(root=dataset_path, name=dataset_name)
+    #     if dataset_name == 'ENZYMES':
+    #         dataset = dataset_class(root=dataset_path, use_node_attr=True)
+    #         logging.info(f"Additional 18 node attributes used for ENZYMES")
+    #     else:
+    #         dataset = dataset_class(root=dataset_path)
+    #else:
+    dataset = TUDataset(root=dataset_path, name=dataset_name)
 
     for i, data in enumerate(dataset):
         logging.info(f"Processing graph {i + 1}/{len(dataset)} in dataset {dataset_name}")
@@ -128,4 +158,7 @@ if __name__ == "__main__":
     # preprocess_dataset(args.dataset_path, args.dataset_name, use_rewired=args.use_rewired)
 
 # use it like: python PrepareDatasets.py DATA/CHEMICAL --dataset-name NCI1 --use-rewired
+
+
+# ~ python PrepareDatasets.py DATA/CHEMICAL --dataset-name PROTEINS --outer-k 10 --use-rewired
 
