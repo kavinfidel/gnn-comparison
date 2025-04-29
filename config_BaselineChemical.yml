@@ -15,9 +15,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 model:
-  - MolecularFingerprint
+  - GraphSAGE
 device:
-  - cpu
+  - cuda
 batch_size:
   - 32
   - 128
@@ -40,7 +40,7 @@ optimizer:
 scheduler:
   - null
 loss:
-  - MulticlassClassificationLoss
+  - BinaryClassificationLoss
 gradient_clipping:
   - null
 early_stopper:
@@ -56,3 +56,16 @@ early_stopper:
       use_loss: True
 shuffle:
   - True
+num_layers:
+  - 1
+  - 2
+
+dim_embedding:
+  - 32
+  - 64
+
+aggregation:
+  - mean
+  - max
+
+

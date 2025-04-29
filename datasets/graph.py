@@ -25,6 +25,7 @@ import networkx as nx
 import logging
 import torch
 from torch_geometric.utils import dense_to_sparse
+from torch_geometric.utils.convert import to_networkx
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -46,7 +47,7 @@ class Graph(nx.Graph):
 
         logging.info("Edge Rewiring starting for graph with %d nodes and %d edges", self.number_of_nodes(), self.number_of_edges())
 
-        g6 = to_networkx(self, to_undirected=True)
+        g6 = self
         bridges = list(nx.bridges(g6))
         adj_node_dict = {}
 
