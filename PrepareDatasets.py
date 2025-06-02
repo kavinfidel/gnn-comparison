@@ -26,7 +26,7 @@ from torch_geometric.utils import dense_to_sparse
 from torch_geometric.utils.convert import to_networkx
 
 
-def rewire_graph(g: nx.Graph) -> torch.Tensor:
+def rewire_graph(g: nx.Graph) -> torch.Tensor:   # REWIRE 1
     logging.info("Edge Rewiring starting for graph with %d nodes and %d edges", g.number_of_nodes(), g.number_of_edges())
 
     g6 = g.copy()
