@@ -29,7 +29,7 @@ early_stopper:
 shuffle:
   - True
 num_layers:
-  - 2
+  - 5
 dim_embedding:
   - 64
 aggregation:
