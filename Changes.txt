@@ -63,3 +63,5 @@ Removing the boolean flag for rewired_all_layers
         unfortunately ran the experiment with multiclass classification, but still the model ran for 5000 epochs and started the k = 2 CV, so it is working.
 
 
+Jun 21:
+# Made changes to make use of rewire_for_all_layers flag 

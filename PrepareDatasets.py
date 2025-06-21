@@ -17,6 +17,7 @@
 import argparse
 import os
 import logging
+from numpy import ogrid
 import torch
 from datasets import *
 from torch_geometric.datasets import TUDataset
@@ -97,13 +98,17 @@ def preprocess_dataset(dataset_path, dataset_name, use_rewired=False, rewiring_s
             graph = to_networkx(data, to_undirected=True)
             
             # Apply the selected rewiring strategy
-            if rewiring_strategy == 'bridges':
-                data.edge_index = rewire_Graph(data)
+            if rewiring_strategy == 'bridges': # made changes to accomodate last layer rewiring 
+                original_edge_index = data.edge_index.clone()
+                rewired_edge_index = rewire_Graph(data)
+                data.edge_index = original_edge_index
+                data.rewired_edge_index = rewired_edge_index
+
             elif rewiring_strategy == 'betweenness':
                 data.edge_index = rewire_Graph_betweenness(data, top_n=top_n)
             elif rewiring_strategy == 'local_bridges':
                 data.edge_index = rewire_Graph_local_bridges(data, top_n=top_n)
-            else:
+            else: # can it be without rewiring?
                 logging.warning(f"Unknown rewiring strategy: {rewiring_strategy}. Using bridges.")
                 data.edge_index = rewire_Graph(data)
             

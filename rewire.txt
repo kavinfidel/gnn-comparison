@@ -1,19 +1,9 @@
-import argparse
-import os
-import logging
-import torch
-from datasets import *
-from torch_geometric.datasets import TUDataset
-from torch_geometric.data import Data
-import networkx as nx
-from torch_geometric.utils import dense_to_sparse
-from torch_geometric.utils.convert import to_networkx
-import pickle
-
 
 
 def rewire_Graph(data): # connects the neighbors of a bridge node to the other bridge node
     """Original bridge-based rewiring function"""
+    import networkx as nx
+    from torch_geometric.utils import to_networkx
     
     logging.info("Starting bridge-based rewiring...")
     g6 = to_networkx(data, to_undirected=True)
@@ -53,26 +43,6 @@ def rewire_Graph(data): # connects the neighbors of a bridge node to the other b
     
     logging.info("Bridge rewiring complete. New edge count: %d", edge_index.size(1))
     return edge_index
-
-def get_edge_index(self, rewire = False ):
-    adj = torch.Tensor(nx.to_numpy_array(self))
-    edge_index, _ = dense_to_sparse(adj)
-
-    if rewire:
-        edge_index = self.rewire_edges()
-    return edge_index
-
-def get_original_and_rewired_edge_index(self):
-    """
-    Get both the original and rewired edge indices.
-
-    Returns:
-        tuple: (original_edge_index, rewired_edge_index)
-    """
-    original_edge_index = self.get_edge_index(rewire=False)
-    rewired_edge_index = self.get_edge_index(rewire=True)
-    return original_edge_index, rewired_edge_index
-
 
 def find_local_bridges(G):
     """
