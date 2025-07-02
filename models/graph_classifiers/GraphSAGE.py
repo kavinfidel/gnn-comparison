@@ -27,7 +27,8 @@ class GraphSAGE(nn.Module):
         num_layers = config['num_layers']
         dim_embedding = config['dim_embedding']
         self.aggregation = config['aggregation']  # can be mean or max
-        self.use_rewired_for_all_layers = bool(config.get('rewire_for_all_layers',0))
+        self.use_rewired_for_all_layers = bool(config['rewire_for_all_layers']) if 'rewire_for_all_layers' in config else False
+
         
 
         if self.aggregation == 'max':
@@ -46,8 +47,9 @@ class GraphSAGE(nn.Module):
         self.fc1 = nn.Linear(num_layers * dim_embedding, dim_embedding)
         self.fc2 = nn.Linear(dim_embedding, dim_target)
 
-    def forward(self, data):
-        rewired_edge_index = getattr(data,'rewire_edge_index', None) 
+    def forward(self, data, rewired_edge_index = None):
+        if rewired_edge_index is None:
+            rewired_edge_index = getattr(data,'rewire_edge_index', None) 
         x, edge_index, batch, = data.x, data.edge_index, data.batch
 
         if self.use_rewired_for_all_layers and rewired_edge_index is not None:

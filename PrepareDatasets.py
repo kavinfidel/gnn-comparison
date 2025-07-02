@@ -26,6 +26,7 @@ import networkx as nx
 from torch_geometric.utils import dense_to_sparse
 from torch_geometric.utils.convert import to_networkx
 import pickle
+from torch_geometric.data import InMemoryDataset
 
 
 from rewire_functions import (
@@ -90,7 +91,7 @@ def preprocess_dataset(dataset_path, dataset_name, use_rewired=False, rewiring_s
     # Use TUDataset directly like the original working code
     dataset = TUDataset(root=dataset_path, name=dataset_name)
 
-    for i, data in enumerate(dataset):
+    for i, data in enumerate(dataset): # data is a single graph object
         logging.info(f"Processing graph {i + 1}/{len(dataset)} in dataset {dataset_name}")
         
         if use_rewired:
@@ -114,10 +115,15 @@ def preprocess_dataset(dataset_path, dataset_name, use_rewired=False, rewiring_s
             
             logging.info(f"Original edges: {data.edge_index.size(1)} | Strategy: {rewiring_strategy}")
 
-    # Save the dataset with a different name if rewired
+    # # Save the dataset with a different name if rewired
+    # save_name = f"{dataset_name}_rewired&original_preprocessed.pt" if use_rewired else f"{dataset_name}_processed.pt"
+    # torch.save(dataset, os.path.join(dataset_path, save_name))
+    # print(f"Dataset {dataset_name} processed & saved as {save_name} in {dataset_path}.")
+
+    data_list = list(dataset)
+    data,slices = InMemoryDataset.collate(data_list)
     save_name = f"{dataset_name}_rewired&original_preprocessed.pt" if use_rewired else f"{dataset_name}_processed.pt"
-    torch.save(dataset, os.path.join(dataset_path, save_name))
-    print(f"Dataset {dataset_name} processed & saved as {save_name} in {dataset_path}.")
+    torch.save((data,slices),os.path.join(dataset_path,save_name))
 
 if __name__ == "__main__":
     
@@ -151,3 +157,4 @@ if __name__ == "__main__":
 
 # ~ python PrepareDatasets.py DATA/CHEMICAL --dataset-name PROTEINS --outer-k 10 --use-rewired
 
+# python Launch_Experiments.py --config-file config_fixed.yml --dataset-name PROTEINS --result-folder RESULTS --debug
