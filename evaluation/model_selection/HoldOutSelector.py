@@ -68,6 +68,10 @@ class HoldOutSelector:
         :param debug:
         :return: the best performing configuration on average over the k folds. TL;DR RETURNS A MODEL, NOT AN ESTIMATE!
         """
+        # if skip_model_selection:
+        #     print("Skipping holdout model selection. Using config directly")
+        #     return model_configs[0]  # Return the first config as the best one
+
         HOLDOUT_MS_FOLDER = os.path.join(exp_path, 'HOLDOUT_MS')
 
         if not os.path.exists(HOLDOUT_MS_FOLDER):

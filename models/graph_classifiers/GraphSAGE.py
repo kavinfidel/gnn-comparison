@@ -48,8 +48,9 @@ class GraphSAGE(nn.Module):
         self.fc2 = nn.Linear(dim_embedding, dim_target)
 
     def forward(self, data, rewired_edge_index = None):
-        if rewired_edge_index is None:
-            rewired_edge_index = getattr(data,'rewire_edge_index', None) 
+        # if rewired_edge_index is None:
+        #     rewired_edge_index = getattr(data,'rewire_edge_index', None) 
+        rewired_edge_index = data.rewired_edge_index if hasattr(data, 'rewired_edge_index') else rewired_edge_index
         x, edge_index, batch, = data.x, data.edge_index, data.batch
 
         if self.use_rewired_for_all_layers and rewired_edge_index is not None:
