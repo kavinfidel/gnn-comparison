@@ -30,7 +30,6 @@ class GIN(torch.nn.Module):
         self.dropout = config['dropout']
         self.embeddings_dim = [config['hidden_units'][0]] + config['hidden_units']
         self.no_layers = len(self.embeddings_dim)
-        self.first_h = []
         self.nns = []
         self.convs = []
         self.linears = []
@@ -42,10 +41,14 @@ class GIN(torch.nn.Module):
             self.pooling = global_mean_pool
 
         for layer, out_emb_dim in enumerate(self.embeddings_dim):
+        # Initialize first_h before the loop
+            if len(self.embeddings_dim) > 0:
+                self.first_h = Sequential(Linear(dim_features, self.embeddings_dim[0]), BatchNorm1d(self.embeddings_dim[0]), ReLU(),
+                                        Linear(self.embeddings_dim[0], self.embeddings_dim[0]), BatchNorm1d(self.embeddings_dim[0]), ReLU())
+
+        for layer, out_emb_dim in enumerate(self.embeddings_dim):
 
             if layer == 0:
-                self.first_h = Sequential(Linear(dim_features, out_emb_dim), BatchNorm1d(out_emb_dim), ReLU(),
-                                    Linear(out_emb_dim, out_emb_dim), BatchNorm1d(out_emb_dim), ReLU())
                 self.linears.append(Linear(out_emb_dim, dim_target))
             else:
                 input_emb_dim = self.embeddings_dim[layer-1]
