@@ -79,6 +79,13 @@ def get_args_dict():
 
     return vars(parser.parse_args())
 
+
+# class CustomData(Data):
+#     def __inc__(self,key,value):
+#         if key =='rewired_edge_index':
+#             return self.num_nodes
+#         return super().__inc__(key,value)
+
 def preprocess_dataset(dataset_path, dataset_name, use_rewired=False, rewiring_strategy='bridges', top_n=2):
     """
     Preprocess the dataset and optionally add rewired edges.
@@ -90,20 +97,25 @@ def preprocess_dataset(dataset_path, dataset_name, use_rewired=False, rewiring_s
     
     # Use TUDataset directly like the original working code
     dataset = TUDataset(root=dataset_path, name=dataset_name)
+    # processed_data_list = []
+
 
     for i, data in enumerate(dataset): # data is a single graph object
         logging.info(f"Processing graph {i + 1}/{len(dataset)} in dataset {dataset_name}")
         
+        # data_dict = data.to_dict()
         if use_rewired:
-            # Convert data to nx graph
-            graph = to_networkx(data, to_undirected=True)
+            # # Convert data to nx graph
+            # graph = to_networkx(data, to_undirected=True)
             
             # Apply the selected rewiring strategy
             if rewiring_strategy == 'bridges': # made changes to accomodate last layer rewiring 
                 original_edge_index = data.edge_index.clone()
                 rewired_edge_index = rewire_Graph(data)
-                data.edge_index = original_edge_index
                 data.rewired_edge_index = rewired_edge_index
+                data.edge_index = original_edge_index
+                # data_dict['edge_index'] = original_edge_index
+                # data_dict['rewired_edge_index'] = rewired_edge_index
 
             elif rewiring_strategy == 'betweenness':
                 data.edge_index = rewire_Graph_betweenness(data, top_n=top_n)
@@ -115,15 +127,25 @@ def preprocess_dataset(dataset_path, dataset_name, use_rewired=False, rewiring_s
             
             logging.info(f"Original edges: {data.edge_index.size(1)} | Strategy: {rewiring_strategy}")
 
-    # # Save the dataset with a different name if rewired
-    # save_name = f"{dataset_name}_rewired&original_preprocessed.pt" if use_rewired else f"{dataset_name}_processed.pt"
-    # torch.save(dataset, os.path.join(dataset_path, save_name))
-    # print(f"Dataset {dataset_name} processed & saved as {save_name} in {dataset_path}.")
+    # 1st VERSION:
+    # Save the dataset with a different name if rewired
+    save_name = f"{dataset_name}_rewired&originali_preprocessed.pt" if use_rewired else f"{dataset_name}_processed.pt"
+    torch.save(dataset, os.path.join(dataset_path, save_name))
+    print(f"Dataset {dataset_name} processed & saved as {save_name} in {dataset_path}.")
 
-    data_list = list(dataset)
-    data,slices = InMemoryDataset.collate(data_list)
-    save_name = f"{dataset_name}_rewired&original_preprocessed.pt" if use_rewired else f"{dataset_name}_processed.pt"
-    torch.save((data,slices),os.path.join(dataset_path,save_name))
+#     # # # 2nd VERSION: by Kavin
+#     # data_list = list(dataset)
+#     # data,slices = InMemoryDataset.collate(data_list)
+#     # save_name = f"{dataset_name}_rewired&original_preprocessed.pt" if use_rewired else f"{dataset_name}_processed.pt"
+#     # torch.save((data,slices),os.path.join(dataset_path,save_name))
+
+# # 3rd VERSION: by Kavin
+#         custom_data = CustomData(**data_dict)
+#         processed_data_list.append(custom_data)
+
+    # data,slices = InMemoryDataset.collate(processed_data_list)
+    # save_name = f"{dataset_name}_rewired&originalii_preprocessed.pt" if use_rewired else f"{dataset_name}_processed.pt"
+    # torch.save((data,slices),os.path.join(dataset_path,save_name))
 
 if __name__ == "__main__":
     

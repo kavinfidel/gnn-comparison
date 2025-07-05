@@ -67,15 +67,19 @@ class KFoldSelection:
 
         return best_config
 
-    def model_selection(self, dataset_getter, experiment_class, exp_path, model_configs, debug=False, other=None):
+    def model_selection(self, dataset_getter, experiment_class, exp_path, model_configs, debug=False, other=None, skip_model_selection = False):
         """
         :param experiment_class: the kind of experiment used
         :param debug:
         :return: the best performing configuration on average over the k folds. TL;DR RETURNS A MODEL, NOT AN ESTIMATE!
         """
-        # if skip_model_selection:
-        #     print("Skipping k-fold model selection. Using config directly")
-        #     return model_configs[0]  # Return the first config as the best one
+        if skip_model_selection:
+            print("Skipping k-fold model selection. Using config directly")
+            return {
+                'config': model_configs[0],
+                'VL_score': None,
+                'TR_score': None
+            }
 
         exp_path = exp_path
         KFOLD_FOLDER = os.path.join(exp_path, str(self.folds) + '_FOLD_MS')

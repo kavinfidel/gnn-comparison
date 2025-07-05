@@ -121,7 +121,7 @@ class KFoldAssessment:
         dataset_getter = DatasetGetter(outer_k)
 
         best_config = self.model_selector.model_selection(dataset_getter, experiment_class, exp_path,
-                                                          self.model_configs, debug, other)
+                                                          self.model_configs, debug, other,skip_model_selection = True)
 
         # Retrain with the best configuration and test
         experiment = experiment_class(best_config['config'], exp_path)
