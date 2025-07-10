@@ -35,6 +35,6 @@ dim_embedding:
 aggregation:
   - mean
 rewire_for_all_layers:
-  - 0 # 1 means rewire all layers
+  - 1 # 1 means rewire all layers
 skip_model_selection:
   - 1 

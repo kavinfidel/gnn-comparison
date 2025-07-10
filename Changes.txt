@@ -65,3 +65,752 @@ Removing the boolean flag for rewired_all_layers
 
 Jun 21:
 # Made changes to make use of rewire_for_all_layers flag 
+
+
+├── # Code Citations.md
+├── .gitignore
+├── Changes.txt
+├── Check isomorphisms and noisy labels.ipynb
+├── Conda_Info
+├── EndToEnd_Evaluation.py
+├── LICENSE
+├── Launch_Experiments.py
+├── PrepareDatasets.py
+├── README.md
+├── __init__.py
+├── config
+│   ├── __init__.py
+│   ├── base.py
+│   └── utils.py
+├── config_BaselineChemical.yml
+├── config_BaselineENZYMES.yml
+├── config_BaselineIMDB.yml
+├── config_BaselineSocial.yml
+├── config_DGCNN.yml
+├── config_DiffPool.yml
+├── config_ECC.yml
+├── config_GIN.yml
+├── config_GraphSAGE.yml
+├── config_fixed.yml
+├── config_fixed_gin.yml
+├── data_splits
+│   ├── CHEMICAL
+│   │   ├── DD_splits.json
+│   │   ├── ENZYMES_splits.json
+│   │   ├── NCI1_splits.json
+│   │   └── PROTEINS_full_splits.json
+│   ├── COLLABORATIVE_1
+│   │   ├── COLLAB_splits.json
+│   │   ├── IMDB-BINARY_splits.json
+│   │   ├── IMDB-MULTI_splits.json
+│   │   ├── REDDIT-BINARY_splits.json
+│   │   └── REDDIT-MULTI-5K_splits.json
+│   └── COLLABORATIVE_DEGREE
+│       ├── COLLAB_splits.json
+│       ├── IMDB-BINARY_splits.json
+│       ├── IMDB-MULTI_splits.json
+│       ├── REDDIT-BINARY_splits.json
+│       └── REDDIT-MULTI-5K_splits.json
+├── datasets
+│   ├── __init__.py
+│   ├── data.py
+│   ├── dataloader.py
+│   ├── dataset.py
+│   ├── graph.py
+│   ├── manager.py
+│   ├── rewire.py
+│   ├── sampler.py
+│   └── tu_utils.py
+├── evaluation
+│   ├── dataset_getter.py
+│   ├── model_selection
+│   │   ├── HoldOutSelector.py
+│   │   └── K_Fold_Selection.py
+│   └── risk_assessment
+│       ├── HoldOutAssessment.py
+│       └── K_Fold_Assessment.py
+├── experiments
+│   ├── EndToEndExperiment.py
+│   └── Experiment.py
+├── images
+│   └── overall-process.png
+├── install.sh
+├── install_original.sh
+├── log
+│   ├── Logger.py
+│   └── __init__.py
+├── models
+│   ├── __init__.py
+│   ├── gnn_wrapper
+│   │   ├── NetWrapper.py
+│   │   └── __init__.py
+│   ├── graph_classifiers
+│   │   ├── DGCNN.py
+│   │   ├── DeepMultisets.py
+│   │   ├── DiffPool.py
+│   │   ├── ECC.py
+│   │   ├── GIN.py
+│   │   ├── GraphSAGE.py
+│   │   ├── MLP_Classifier.py
+│   │   ├── MolecularFingerprint.py
+│   │   └── __init__.py
+│   ├── modules.py
+│   ├── schedulers
+│   │   └── ECCScheduler.py
+│   └── utils
+│       ├── EarlyStopper.py
+│       └── __init__.py
+├── notebooks
+│   ├── Bridges_Rewiring_Enzymes.ipynb
+│   ├── Enzymes_GraphSage.ipynb
+│   ├── GNN_local_bridges.ipynb
+│   ├── MUTAG_GraphSAGE.ipynb
+│   ├── betweeness.ipynb
+│   └── experiment_main.ipynb
+├── requirements_original.txt
+├── results_PROTEINS_GIN
+│   └── GIN_PROTEINS_assessment
+│       └── 10_NESTED_CV
+│           ├── OUTER_FOLD_1
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_10
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_2
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_3
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_4
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_5
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_6
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_7
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_8
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_9
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           └── assessment_results.json
+├── results_PROTEINS_GIN_betweenness3
+│   └── GIN_PROTEINS_assessment
+│       └── 10_NESTED_CV
+│           ├── OUTER_FOLD_1
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_10
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_2
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_3
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_4
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_5
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_6
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_7
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_8
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_9
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           └── assessment_results.json
+├── results_PROTEINS_GIN_bridges_rewired
+│   └── GIN_PROTEINS_assessment
+│       └── 10_NESTED_CV
+│           ├── OUTER_FOLD_1
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_10
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_2
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_3
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_4
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_5
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_6
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_7
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_8
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_9
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           └── assessment_results.json
+├── results_PROTEINS_GIN_localbridges3
+│   └── GIN_PROTEINS_assessment
+│       └── 10_NESTED_CV
+│           ├── OUTER_FOLD_1
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_10
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_2
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_3
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_4
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_5
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_6
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_7
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_8
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_9
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           └── assessment_results.json
+├── results_PROTEINS_betweeness_edge3
+│   └── GraphSAGE_PROTEINS_assessment
+│       └── 10_NESTED_CV
+│           ├── OUTER_FOLD_1
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_10
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_2
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_3
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_4
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_5
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_6
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_7
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_8
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_9
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           └── assessment_results.json
+├── results_PROTEINS_localbridge5
+│   └── GraphSAGE_PROTEINS_assessment
+│       └── 10_NESTED_CV
+│           ├── OUTER_FOLD_1
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_10
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_2
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_3
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_4
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_5
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_6
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_7
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_8
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_9
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           └── assessment_results.json
+├── results_PROTEINS_rewired
+│   └── GraphSAGE_PROTEINS_assessment
+│       └── 10_NESTED_CV
+│           ├── OUTER_FOLD_1
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_10
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_2
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_3
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_4
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_5
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_6
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_7
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_8
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_9
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           └── assessment_results.json
+├── results_PROTEINS_rewired2
+│   └── GraphSAGE_PROTEINS_assessment
+│       └── 10_NESTED_CV
+│           ├── OUTER_FOLD_1
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_10
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_2
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_3
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_4
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_5
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_6
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_7
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_8
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_9
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           └── assessment_results.json
+├── results_PROTEINS_standard
+│   └── GraphSAGE_PROTEINS_assessment
+│       └── 10_NESTED_CV
+│           ├── OUTER_FOLD_1
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_10
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_2
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_3
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_4
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_5
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_6
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_7
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_8
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_9
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           └── assessment_results.json
+├── results_PROTEINS_standard2
+│   └── GraphSAGE_PROTEINS_assessment
+│       └── 10_NESTED_CV
+│           ├── OUTER_FOLD_1
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_10
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_2
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_3
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_4
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_5
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_6
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_7
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_8
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           ├── OUTER_FOLD_9
+│           │   ├── HOLDOUT_MS
+│           │   │   ├── config_1
+│           │   │   │   └── config_results.json
+│           │   │   └── winner_config.json
+│           │   └── outer_results.json
+│           └── assessment_results.json
+├── rewire.txt
+├── rewire_functions.py
+├── test.ipynb
+└── utils
+    ├── batch_utils.py
+    └── utils.py
