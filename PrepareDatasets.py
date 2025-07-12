@@ -128,13 +128,13 @@ def preprocess_dataset(dataset_path, dataset_name, use_rewired=False, rewiring_s
             
             logging.info(f"Original edges: {data.edge_index.size(1)} | Strategy: {rewiring_strategy}")
 
-    # 1st VERSION:
+    # # 1st VERSION:
     # Save the dataset with a different name if rewired
     save_name = f"{dataset_name}_rewired&originali_preprocessed.pt" if use_rewired else f"{dataset_name}_processed.pt"
     torch.save(dataset, os.path.join(dataset_path, save_name))
     print(f"Dataset {dataset_name} processed & saved as {save_name} in {dataset_path}.")
 
-    # # # <DATA, SLICES>. VERSIO
+    # # # <DATA, SLICES>. VERSION
     # data_list = list(dataset)
     # data,slices = InMemoryDataset.collate(data_list)
     # save_name = f"{dataset_name}_rewired&original_preprocessed.pt" if use_rewired else f"{dataset_name}_processed.pt"
