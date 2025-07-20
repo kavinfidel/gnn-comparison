@@ -15,6 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 import torch
+from torch._C import NoneType
 import torch.nn.functional as F
 from torch import nn
 from torch_geometric.nn import SAGEConv, global_max_pool
@@ -47,21 +48,27 @@ class GraphSAGE(nn.Module):
         self.fc1 = nn.Linear(num_layers * dim_embedding, dim_embedding)
         self.fc2 = nn.Linear(dim_embedding, dim_target)
 
-    def forward(self, data, rewired_edge_index = None):
+    def forward(self, data):
         # if rewired_edge_index is None:
         #     rewired_edge_index = getattr(data,'rewire_edge_index', None) 
-        rewired_edge_index = data.rewired_edge_index if hasattr(data, 'rewired_edge_index') else rewired_edge_index
+       #rewired_edge_index = data.rewired_edge_index if hasattr(data, 'rewired_edge_index') else None
+        
+        
+        # rewired_edge_index = data.rewired_edge_index
+        # print(rewired_edge_index)
         x, edge_index, batch, = data.x, data.edge_index, data.batch
+        rewired_edge_index = data.rewired_edge_index
 
-        if self.use_rewired_for_all_layers and rewired_edge_index is not None:
+        if self.use_rewired_for_all_layers:
             edge_index = rewired_edge_index
-
+        
         x_all = []
 
         for i, layer in enumerate(self.layers):
 
-            if not self.use_rewired_for_all_layers and i == len(self.layers) - 1 and rewired_edge_index is not None:
+            if not self.use_rewired_for_all_layers and i == len(self.layers) - 1:
                 edge_index = rewired_edge_index
+                #print("_________")
                 
             x = layer(x, edge_index)
             if self.aggregation == 'max':

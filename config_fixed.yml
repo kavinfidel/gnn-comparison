@@ -29,12 +29,12 @@ early_stopper:
 shuffle:
   - True
 num_layers:
-  - 5
+  - 3 # changed: 5 ----> 3
 dim_embedding:
   - 64
 aggregation:
-  - mean
+  - mean 
 rewire_for_all_layers:
-  - 1 # 1 means rewire all layers
+  - 0 # 1 means rewire all layers
 skip_model_selection:
   - 1 
