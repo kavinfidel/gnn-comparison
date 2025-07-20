@@ -110,19 +110,19 @@ def preprocess_dataset(dataset_path, dataset_name, use_rewired=False, rewiring_s
                 original_edge_index = data.edge_index.clone()
                 rewired_edge_index = rewire_Graph(data)
                 data.rewired_edge_index = rewired_edge_index
-                data.edge_index = original_edge_index
+                data.edge_index = rewired_edge_index
         
             elif rewiring_strategy == 'betweenness':
                 original_edge_index = data.edge_index.clone()
                 rewired_edge_index = rewire_Graph_betweenness(data, top_n=top_n)
                 data.rewired_edge_index = rewired_edge_index
-                data.edge_index = original_edge_index
+                data.edge_index = rewired_edge_index
          
             elif rewiring_strategy == 'local_bridges':
                 original_edge_index = data.edge_index.clone()
                 rewired_edge_index = rewire_Graph_local_bridges(data, top_n=top_n)
                 data.rewired_edge_index = rewired_edge_index
-                data.edge_index = original_edge_index
+                data.edge_index = rewired_edge_index
                 
             else: # can it be without rewiring?
                 logging.warning(f"Unknown rewiring strategy: {rewiring_strategy}. Using bridges.")
@@ -134,7 +134,7 @@ def preprocess_dataset(dataset_path, dataset_name, use_rewired=False, rewiring_s
     # 1st VERSION:
     #Save the dataset with a different name if rewired
     save_name = f"{dataset_name}_{rewiring_strategy}.pt" if use_rewired else f"{dataset_name}_processed.pt"
-    torch.save(rewired_data_list, os.path.join(dataset_path, save_name))
+    torch.save(dataset, os.path.join(dataset_path, save_name))
     print(f"Dataset {dataset_name} processed & saved as {save_name} in {dataset_path}.")
 
     # # # # <DATA, SLICES>. VERSION

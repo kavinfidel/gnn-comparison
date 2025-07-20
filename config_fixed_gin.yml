@@ -9,7 +9,7 @@ learning_rate:
 classifier_epochs:          
   - 200
 hidden_units:
-  - [128, 128, 128]
+  - [128, 128, 128, 128, 128] 
 optimizer:                 
   - Adam
 scheduler:                 
