@@ -30,9 +30,11 @@ early_stopper:
   -
     class: Patience
     args:
-      patience: 50
+      patience: 100
       use_loss: False
 shuffle:                   
   - True
 resume:                   
   - False
+rewire_all_layers:
+  - 0 # 0 means last layer rewirin

@@ -33,6 +33,7 @@ class GIN(torch.nn.Module):
         self.nns = []
         self.convs = []
         self.linears = []
+        self.rewire_all_layers = bool(config['rewire_all_layers'])
 
         train_eps = config['train_eps']
         if config['aggregation'] == 'sum':
@@ -63,11 +64,22 @@ class GIN(torch.nn.Module):
         self.linears = torch.nn.ModuleList(self.linears)  # has got one more for initial input
 
     def forward(self, data):
-        x, edge_index, batch = data.x, data.edge_index, data.batch
+        x, batch = data.x, data.batch
+        rewired_edge_index = data.rewired_edge_index
+
+        if self.rewire_all_layers:
+            edge_index = rewired_edge_index
+        else:
+            edge_index = data.edge_index
+            
 
         out = 0
 
         for layer in range(self.no_layers):
+            if not self.rewire_all_layers and layer == self.no_layers - 1:
+                edge_index = rewired_edge_index
+                
+           
             if layer == 0:
                 x = self.first_h(x)
                 out += F.dropout(self.pooling(self.linears[layer](x), batch), p=self.dropout)

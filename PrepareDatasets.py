@@ -48,7 +48,8 @@ DATASETS = {
     'NCI1': NCI1,
     'ENZYMES': Enzymes,
     'PROTEINS': Proteins,
-    'DD': DD
+    'DD': DD,
+  
 }
 
 def get_args_dict():
@@ -133,8 +134,8 @@ def preprocess_dataset(dataset_path, dataset_name, use_rewired=False, rewiring_s
 
     # 1st VERSION:
     #Save the dataset with a different name if rewired
-    save_name = f"{dataset_name}_{rewiring_strategy}.pt" if use_rewired else f"{dataset_name}_processed.pt"
-    torch.save(dataset, os.path.join(dataset_path, save_name))
+    save_name = f"{dataset_name}_{rewiring_strategy}_{top_n}.pt" if use_rewired else f"{dataset_name}_processed.pt"
+    torch.save(rewired_data_list, os.path.join(dataset_path, save_name))
     print(f"Dataset {dataset_name} processed & saved as {save_name} in {dataset_path}.")
 
     # # # # <DATA, SLICES>. VERSION
