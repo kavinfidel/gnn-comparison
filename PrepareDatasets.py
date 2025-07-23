@@ -27,7 +27,7 @@ from torch_geometric.utils import dense_to_sparse
 from torch_geometric.utils.convert import to_networkx
 import pickle
 from torch_geometric.data import InMemoryDataset
-
+from torch_geometric.utils import to_dense_adj, dense_to_sparse
 
 from rewire_functions import (
     rewire_Graph,
@@ -111,19 +111,20 @@ def preprocess_dataset(dataset_path, dataset_name, use_rewired=False, rewiring_s
                 original_edge_index = data.edge_index.clone()
                 rewired_edge_index = rewire_Graph(data)
                 data.rewired_edge_index = rewired_edge_index
-                data.edge_index = rewired_edge_index
+                data.edge_index = original_edge_index
         
             elif rewiring_strategy == 'betweenness':
                 original_edge_index = data.edge_index.clone()
                 rewired_edge_index = rewire_Graph_betweenness(data, top_n=top_n)
                 data.rewired_edge_index = rewired_edge_index
-                data.edge_index = rewired_edge_index
+                data.edge_index = original_edge_index
+
          
             elif rewiring_strategy == 'local_bridges':
                 original_edge_index = data.edge_index.clone()
                 rewired_edge_index = rewire_Graph_local_bridges(data, top_n=top_n)
                 data.rewired_edge_index = rewired_edge_index
-                data.edge_index = rewired_edge_index
+                data.edge_index = original_edge_index
                 
             else: # can it be without rewiring?
                 logging.warning(f"Unknown rewiring strategy: {rewiring_strategy}. Using bridges.")
@@ -176,6 +177,6 @@ if __name__ == "__main__":
 # use it like: python PrepareDatasets.py DATA/CHEMICAL --dataset-name NCI1 --use-rewired
 
 
-# ~ python PrepareDatasets.py DATA/CHEMICAL --dataset-name PROTEINS --outer-k 10 --use-rewired
+# ~ python PrepareDatasets.py DATA/CHEMICAL --dataset-name NCI1 --outer-k 10 --use-rewired --rewiring-strategy local_bridges --top-n-edges 5
 
-# python Launch_Experiments.py --config-file config_fixed.yml --dataset-name PROTEINS --result-folder RESULTS --debug
+# python Launch_Experiments.py --config-file config_fixed.yml --dataset-name NCI1 --result-folder NCI1_RESULTS_LAST --debug
