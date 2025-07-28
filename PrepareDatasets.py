@@ -33,7 +33,8 @@ from rewire_functions import (
     rewire_Graph,
     rewire_Graph_local_bridges,
     rewire_Graph_betweenness,
-    apply_rewiring_strategy)
+    apply_rewiring_strategy,
+    complement_graph)
 
 
 
@@ -72,7 +73,7 @@ def get_args_dict():
     parser.add_argument('--use-rewired', action = 'store_true', 
                         default = False, help = 'Add rewired edges to the dataset.')
     parser.add_argument('--rewiring-strategy', type=str, default='bridges', 
-                    choices=['bridges', 'betweenness', 'local_bridges'],
+                    choices=['bridges', 'betweenness', 'local_bridges','complement'],
                     help='Rewiring strategy to use: bridges (default), betweenness, or local_bridges')
     parser.add_argument('--top-n-edges', type=int, default=2,
                     help='Number of top edges to rewire (for betweenness and local_bridges strategies)')
@@ -118,6 +119,20 @@ def preprocess_dataset(dataset_path, dataset_name, use_rewired=False, rewiring_s
                 rewired_edge_index = rewire_Graph_betweenness(data, top_n=top_n)
                 data.rewired_edge_index = rewired_edge_index
                 data.edge_index = original_edge_index
+                # data.complement_index = complement_graph(data)
+                # print("comp")
+
+            elif rewiring_strategy == 'complement':
+                original_edge_index = data.edge_index.clone()
+                rewired_edge_index = complement_graph(data)
+                data.rewired_edge_index = rewired_edge_index
+                data.edge_index = original_edge_index     
+
+
+                # Full adjacency
+                # full_adj = torch.ones((data.num_nodes, data.num_nodes)) - torch.eye(data.num_nodes)
+                # full_edge_index, _ = dense_to_sparse(full_adj)
+                # data.full_edge_index = full_edge_index.long()
 
          
             elif rewiring_strategy == 'local_bridges':
@@ -177,6 +192,6 @@ if __name__ == "__main__":
 # use it like: python PrepareDatasets.py DATA/CHEMICAL --dataset-name NCI1 --use-rewired
 
 
-# ~ python PrepareDatasets.py DATA/CHEMICAL --dataset-name NCI1 --outer-k 10 --use-rewired --rewiring-strategy local_bridges --top-n-edges 5
+# ~ python PrepareDatasets.py DATA/CHEMICAL --dataset-name PROTEINS --outer-k 10 --use-rewired --rewiring-strategy complement 
 
-# python Launch_Experiments.py --config-file config_fixed.yml --dataset-name NCI1 --result-folder NCI1_RESULTS_LAST --debug
+# python Launch_Experiments.py --config-file config_fixed.yml --dataset-name PROTEINS --result-folder NCI1_RESULTS_LAST --debug

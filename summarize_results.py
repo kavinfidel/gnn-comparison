@@ -92,4 +92,4 @@ if __name__ == "__main__":
     results_path = args_dict['RESULTS_DIR']
     output_file = args_dict['output_file']
     summarize_all_results_to_csv(results_path, output_file)
-#python summarize_results.py /teamspace/studios/this_studio/gnn-comparison/RESULTS --out_file summary.csv
+#python summarize_results.py /teamspace/studios/this_studio/gnn-comparison/GIN_RESULTS_LAST --out_file summary.csv

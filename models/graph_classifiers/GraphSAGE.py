@@ -57,7 +57,8 @@ class GraphSAGE(nn.Module):
         # rewired_edge_index = data.rewired_edge_index
         # print(rewired_edge_index)
         x, edge_index, batch, = data.x, data.edge_index, data.batch
-        rewired_edge_index = data.rewired_edge_index
+        #rewired_edge_index = data.rewired_edge_index
+        
 
         if self.use_rewired_for_all_layers:
             edge_index = rewired_edge_index
@@ -67,8 +68,11 @@ class GraphSAGE(nn.Module):
         for i, layer in enumerate(self.layers):
 
             if not self.use_rewired_for_all_layers and i == len(self.layers) - 1:
-                edge_index = rewired_edge_index
-                #print("_________")
+                edge_index = data.rewired_edge_index
+                #print("_____2____")
+            # if not self.use_rewired_for_all_layers and i == len(self.layers) - 2:
+            #     edge_index = rewired_edge_index
+            #     #print("1")
                 
             x = layer(x, edge_index)
             if self.aggregation == 'max':
